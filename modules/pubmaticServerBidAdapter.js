@@ -6,8 +6,8 @@ import { registerBidder } from 'src/adapters/bidderFactory';
 const constants = require('src/constants.json');
 
 const BIDDER_CODE = 'pubmaticServer';
-const ENDPOINT = '//ow.pubmatic.com/openrtb/2.4/';
-var COOKIE_SYNC = '//172.16.4.65:8001/cookie_sync/';
+const ENDPOINT = '//172.16.4.65:8001/openrtb/2.4/';
+var COOKIE_SYNC = '//ow.pubmatic.com/cookie_sync/';
 const CURRENCY = 'USD';
 const AUCTION_TYPE = 1; // PubMaticServer just picking highest bidding bid from the partners configured
 const UNDEFINED = undefined;
@@ -317,7 +317,10 @@ export const spec = {
     };
     ajax.ajax(COOKIE_SYNC,
       cookieSyncCallback,
-      JSON.stringify(data));
+      JSON.stringify(data),
+      {
+        withCredentials: true
+      });
     return urls;
   }
 };
