@@ -7,6 +7,7 @@ const ENDPOINT = '//hbopenbid.pubmatic.com/translator?source=prebid-client';
 const USYNCURL = '//ads.pubmatic.com/AdServer/js/showad.js#PIX&kdntuid=1&p=';
 const CURRENCY = 'USD';
 const AUCTION_TYPE = 1;
+import { BANNER, NATIVE, VIDEO } from 'src/mediaTypes';
 const UNDEFINED = undefined;
 const CUSTOM_PARAMS = {
   'kadpageurl': '', // Custom page url
@@ -153,26 +154,45 @@ function _createOrtbTemplate(conf) {
 }
 
 function _createImpressionObject(bid, conf) {
-  return {
-    id: bid.bidId,
-    tagid: bid.params.adUnit,
-    bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
-    secure: window.location.protocol === 'https:' ? 1 : 0,
-    banner: {
-      pos: 0,
-      w: bid.params.width,
-      h: bid.params.height,
-      topframe: utils.inIframe() ? 0 : 1,
-    },
-    ext: {
-      pmZoneId: _parseSlotParam('pmzoneid', bid.params.pmzoneid)
-    }
-  };
+  if (bid.mediaTypes && bid.mediaTypes.hasOwnProperty(VIDEO)) {
+    //video ad
+    return {
+      id: bid.bidId,
+      tagid: bid.params.videoAdUnit,
+      bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
+      video: {
+        mimes: bid.params.video.mimes || undefined,
+        minduration: bid.params.video.minduration || undefined,
+        maxduration: bid.params.video.maxduration || undefined,
+        startdelay: bid.params.video.startdelay || undefined,
+        playbackmethod: bid.params.video.playbackmethods || undefined,
+        api: bid.params.video.api || undefined
+      }
+    };
+  } else {
+    //default to banner ad
+    return {
+      id: bid.bidId,
+      tagid: bid.params.adUnit,
+      bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
+      secure: window.location.protocol === 'https:' ? 1 : 0,
+      banner: {
+        pos: 0,
+        w: bid.params.width,
+        h: bid.params.height,
+        topframe: utils.inIframe() ? 0 : 1,
+      },
+      ext: {
+        pmZoneId: _parseSlotParam('pmzoneid', bid.params.pmzoneid)
+      }
+    };
+  }
+  
 }
 
 export const spec = {
   code: BIDDER_CODE,
-
+  supportedMediaTypes: [BANNER, VIDEO],
   /**
   * Determines whether or not the given bid request is valid. Valid bid request must have placementId and hbid
   *
@@ -213,6 +233,8 @@ export const spec = {
       conf = _handleCustomParams(bid.params, conf);
       conf.transactionId = bid.transactionId;
       payload.imp.push(_createImpressionObject(bid, conf));
+      payload.ext.video_skippable = bid.params.video.skippable || false;
+      payload.site.id = bid.params.adUnit;
     });
 
     if (payload.imp.length == 0) {
@@ -287,7 +309,14 @@ export const spec = {
               referrer: utils.getTopWindowUrl(),
               ad: bid.adm
             };
-
+			var parsedRequest = JSON.parse(request.data);
+          if (parsedRequest.imp && parsedRequest.imp.length > 0) {
+            parsedRequest.imp.forEach(req => {
+              if(bid.impid === req.id && req.hasOwnProperty('video')) {
+                  bid.mediaType = 'video';
+              }
+            });
+          }
             if (bid.ext && bid.ext.deal_channel) {
               newBid['dealChannel'] = dealChannelValues[bid.ext.deal_channel] || null;
             }
