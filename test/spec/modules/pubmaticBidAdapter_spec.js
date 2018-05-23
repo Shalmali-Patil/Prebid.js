@@ -34,6 +34,25 @@ describe('PubMatic adapter', () => {
       }
     ];
 
+    videoBidRequests = [
+      {
+        bidder: 'pubmatic',
+        params: {
+          publisherId: '301',
+          videoAdUnit: '17934',
+          adSlot: '1363568@300x250',
+          video: {
+            skippable: true,
+            playback_methods: ['auto_play_sound_off'],
+            minduration: 5,
+            maxduration: 30,
+            mimes: ['video/mp4','video/x-flv'],
+            placement: ""
+          }
+        }
+      }
+    ];
+
     bidResponses = {
       'body': {
         'id': '93D3BAD6-E2E2-49FB-9D89-920B1761C865',
@@ -197,6 +216,17 @@ describe('PubMatic adapter', () => {
   		  expect(data.imp[0].banner.h).to.equal(250); // height
   		  expect(data.imp[0].ext.pmZoneId).to.equal(bidRequests[0].params.pmzoneid.split(',').slice(0, 50).map(id => id.trim()).join()); // pmzoneid
   		});
+
+      it('Request params check for video ad', () => {
+        let request = spec.buildRequests(videoBidRequests);
+        let data = JSON.parse(request.data);
+        expect(data.ext.skippable).to.equal(videoBidRequests.params.video.skippable);
+        expect(data.imp[0].tagid).to.equal('1363568');
+        expect(data.imp[0].video).to.exist;
+        expect(data.imp[0].video.mimes).to.equal(videoBidRequests.params.video.mimes);
+        expect(data.imp[0].video.maxduration).to.equal(videoBidRequests.params.video.maxduration);
+        expect(data.imp[0].video.minduration).to.equal(videoBidRequests.params.video.minduration);
+      });
 
   		it('invalid adslot', () => {
   		  bidRequests[0].params.adSlot = '/15671365/DMDemo';

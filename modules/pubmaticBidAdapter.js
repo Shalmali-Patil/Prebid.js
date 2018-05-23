@@ -3,7 +3,7 @@ import { registerBidder } from 'src/adapters/bidderFactory';
 const constants = require('src/constants.json');
 
 const BIDDER_CODE = 'pubmatic';
-const ENDPOINT = '//hbopenbid.pubmatic.com/translator?source=prebid-client';
+const ENDPOINT = '//172.16.4.79:8000/translator?source=prebid-client';
 const USYNCURL = '//ads.pubmatic.com/AdServer/js/showad.js#PIX&kdntuid=1&p=';
 const CURRENCY = 'USD';
 const AUCTION_TYPE = 1;
@@ -158,7 +158,7 @@ function _createImpressionObject(bid, conf) {
     //video ad
     return {
       id: bid.bidId,
-      tagid: bid.params.videoAdUnit,
+      tagid: bid.params.adUnit,
       bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
       video: {
         mimes: bid.params.video.mimes || undefined,
@@ -234,7 +234,6 @@ export const spec = {
       conf.transactionId = bid.transactionId;
       payload.imp.push(_createImpressionObject(bid, conf));
       payload.ext.video_skippable = bid.params.video.skippable || false;
-      payload.site.id = bid.params.adUnit;
     });
 
     if (payload.imp.length == 0) {
