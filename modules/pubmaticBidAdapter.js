@@ -204,7 +204,7 @@ export const spec = {
   buildRequests: (validBidRequests, bidderRequest) => {
     var conf = _initConf();
     var payload = _createOrtbTemplate(conf);
-    var bidCurrency = "";
+    var bidCurrency = '';
     validBidRequests.forEach(bid => {
       _parseAdSlot(bid);
       if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex && bid.params.width && bid.params.height)) {
@@ -214,11 +214,10 @@ export const spec = {
       conf.pubId = conf.pubId || bid.params.publisherId;
       conf = _handleCustomParams(bid.params, conf);
       conf.transactionId = bid.transactionId;
-      if(bidCurrency === "") {
+      if (bidCurrency === '') {
         bidCurrency = bid.params.kadfloorcur || undefined;
-      } else if(bidCurrency !== bid.params.kadfloorcur) {
-          utils.logWarn("PubMatic: Currency specifier ignored. Only one currency permitted.");
-          //bidCurrency = validBidRequests[0].params.currency;
+      } else if (bid.params.hasOwnProperty('kadfloorcur') && bidCurrency !== bid.params.kadfloorcur) {
+        utils.logWarn('PubMatic: Currency specifier ignored. Only one currency permitted.');
       }
       bid.params.kadfloorcur = bidCurrency
       payload.imp.push(_createImpressionObject(bid, conf));
