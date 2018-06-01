@@ -1,13 +1,13 @@
 import * as utils from 'src/utils';
 import { registerBidder } from 'src/adapters/bidderFactory';
+import { BANNER, VIDEO } from 'src/mediaTypes';
 const constants = require('src/constants.json');
 
 const BIDDER_CODE = 'pubmatic';
-const ENDPOINT = '//hbopenbid.pubmatic.com/translator?source=prebid-client';
+const ENDPOINT = '//172.16.4.79:8000/translator?source=prebid-client';
 const USYNCURL = '//ads.pubmatic.com/AdServer/js/showad.js#PIX&kdntuid=1&p=';
 const CURRENCY = 'USD';
 const AUCTION_TYPE = 1;
-import { BANNER, NATIVE, VIDEO } from 'src/mediaTypes';
 const UNDEFINED = undefined;
 const CUSTOM_PARAMS = {
   'kadpageurl': '', // Custom page url
@@ -19,6 +19,22 @@ const CUSTOM_PARAMS = {
   'profId': '', // OpenWrap Legacy: Profile ID
   'verId': '' // OpenWrap Legacy: version ID
 };
+const VIDEO_CUSTOM_PARAMS = {
+  'mimes': 'array',
+  'skippable': 'boolean',
+  'minduration': 'number',
+  'maxduration': 'number',
+  'startdelay': 'number',
+  'playbackmethod': 'array',
+  'api': 'array',
+  'protocols': 'array',
+  'w': 'number',
+  'h': 'number',
+  'battr': 'array',
+  'linearity': 'number',
+  'placement': 'number',
+  'maxbitrate': 'number'
+}
 const NET_REVENUE = false;
 const dealChannelValues = {
   1: 'PMP',
@@ -153,41 +169,71 @@ function _createOrtbTemplate(conf) {
   };
 }
 
-function _createImpressionObject(bid, conf) {
-  if (bid.mediaTypes && bid.mediaTypes.hasOwnProperty(VIDEO)) {
-    //video ad
-    return {
-      id: bid.bidId,
-      tagid: bid.params.adUnit,
-      bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
-      video: {
-        mimes: bid.params.video.mimes || undefined,
-        minduration: bid.params.video.minduration || undefined,
-        maxduration: bid.params.video.maxduration || undefined,
-        startdelay: bid.params.video.startdelay || undefined,
-        playbackmethod: bid.params.video.playbackmethods || undefined,
-        api: bid.params.video.api || undefined
+// similar functionality as parseSlotParam. Check if the 2 functions can be clubbed.
+function _checkParamDataType(key, value, datatype) {
+  var errMsg = 'PubMatic: Ignoring param key: ' + key + ', expects ' + datatype + ', found ' + typeof value;
+  switch (datatype) {
+    case 'boolean':
+      if (!utils.isBoolean(value)) {
+        utils.logWarn(errMsg);
+        return UNDEFINED;
       }
-    };
-  } else {
-    //default to banner ad
-    return {
-      id: bid.bidId,
-      tagid: bid.params.adUnit,
-      bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
-      secure: window.location.protocol === 'https:' ? 1 : 0,
-      banner: {
-        pos: 0,
-        w: bid.params.width,
-        h: bid.params.height,
-        topframe: utils.inIframe() ? 0 : 1,
-      },
-      ext: {
-        pmZoneId: _parseSlotParam('pmzoneid', bid.params.pmzoneid)
+      return value;
+    case 'number':
+      if (!utils.isNumber(value)) {
+        utils.logWarn(errMsg);
+        return UNDEFINED;
       }
-    };
+      return value;
+    case 'string':
+      if (!utils.isStr(value)) {
+        utils.logWarn(errMsg);
+        return UNDEFINED;
+      }
+      return value;
+    case 'array':
+      if (!utils.isArray(value)) {
+        utils.logWarn(errMsg);
+        return UNDEFINED;
+      }
+      return value;
   }
-  
+}
+
+function _createImpressionObject(bid, conf) {
+  var impObj = {};
+  var bannerObj = {};
+  var videoObj = {};
+
+  impObj = {
+    id: bid.bidId,
+    tagid: bid.params.adUnit,
+    bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
+    secure: window.location.protocol === 'https:' ? 1 : 0,
+    ext: {
+      pmZoneId: _parseSlotParam('pmzoneid', bid.params.pmzoneid)
+    }
+  };
+
+  if (bid.params.hasOwnProperty('video')) {
+    var videoData = bid.params.video;
+
+    for (var key in VIDEO_CUSTOM_PARAMS) {
+      if (videoData.hasOwnProperty(key)) {
+        videoObj[key] = _checkParamDataType(key, videoData[key], VIDEO_CUSTOM_PARAMS[key])
+      }
+    }
+    impObj.video = videoObj;
+  } else {
+    bannerObj = {
+      pos: 0,
+      w: bid.params.width,
+      h: bid.params.height,
+      topframe: utils.inIframe() ? 0 : 1,
+    }
+    impObj.banner = bannerObj;
+  }
+  return impObj;
 }
 
 export const spec = {
@@ -208,6 +254,13 @@ export const spec = {
       if (!utils.isStr(bid.params.adSlot)) {
         utils.logWarn('PubMatic: adSlotId is mandatory and cannot be numeric. Call to OpenBid will not be sent.');
         return false;
+      }
+      // video ad validation
+      if (bid.params.hasOwnProperty('video')) {
+        if (!bid.params.video.hasOwnProperty('mimes') || !utils.isArray(bid.params.video.mimes) || bid.params.video.mimes.length === 0) {
+          utils.logWarn('PubMatic: For video ads, mimes is mandatory and must specify atlease 1 mime value. Call to OpenBid will not be sent.');
+          return false;
+        }
       }
       return true;
     }
@@ -233,7 +286,9 @@ export const spec = {
       conf = _handleCustomParams(bid.params, conf);
       conf.transactionId = bid.transactionId;
       payload.imp.push(_createImpressionObject(bid, conf));
-      payload.ext.video_skippable = bid.params.video.skippable || false;
+      if (bid.params.hasOwnProperty('video')) {
+        payload.ext.video_skippable = bid.params.video.skippable || false;
+      }
     });
 
     if (payload.imp.length == 0) {
@@ -308,14 +363,14 @@ export const spec = {
               referrer: utils.getTopWindowUrl(),
               ad: bid.adm
             };
-			var parsedRequest = JSON.parse(request.data);
-          if (parsedRequest.imp && parsedRequest.imp.length > 0) {
-            parsedRequest.imp.forEach(req => {
-              if(bid.impid === req.id && req.hasOwnProperty('video')) {
+            var parsedRequest = JSON.parse(request.data);
+            if (parsedRequest.imp && parsedRequest.imp.length > 0) {
+              parsedRequest.imp.forEach(req => {
+                if (bid.impid === req.id && req.hasOwnProperty('video')) {
                   bid.mediaType = 'video';
-              }
-            });
-          }
+                }
+              });
+            }
             if (bid.ext && bid.ext.deal_channel) {
               newBid['dealChannel'] = dealChannelValues[bid.ext.deal_channel] || null;
             }

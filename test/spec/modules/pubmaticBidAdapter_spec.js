@@ -5,6 +5,8 @@ const constants = require('src/constants.json');
 
 describe('PubMatic adapter', () => {
   let bidRequests;
+  let videoBidRequests;
+  let multipleMediaRequests;
   let bidResponses;
 
   beforeEach(() => {
@@ -34,22 +36,89 @@ describe('PubMatic adapter', () => {
       }
     ];
 
-    videoBidRequests = [
+    videoBidRequests =
+    [
       {
+        code: 'video1',
+        mediaTypes: {
+          video: {
+            playerSize: [640, 480],
+            context: 'instream'
+          }
+        },
         bidder: 'pubmatic',
         params: {
-          publisherId: '301',
-          videoAdUnit: '17934',
-          adSlot: '1363568@300x250',
+          publisherId: '351',
+          adSlot: '1363568@300x250', // ad_id or tagid
           video: {
             skippable: true,
-            playback_methods: ['auto_play_sound_off'],
             minduration: 5,
             maxduration: 30,
-            mimes: ['video/mp4','video/x-flv'],
-            placement: ""
+            mimes: ['video/mp4', 'video/x-flv'],
+            startdelay: 5,
+            playbackmethod: [1, 3],
+            api: [ 1, 2 ],
+            protocols: [ 2, 3 ],
+            w: 640,
+            h: 480,
+            battr: [ 13, 14 ],
+            linearity: 1,
+            placement: 2
           }
         }
+      }
+    ];
+
+    multipleMediaRequests =
+    [
+      {
+        code: 'pubmatic_test2',
+        sizes: [[300, 250], [728, 90], [160, 600]],
+        bids: [
+          {
+            bidder: 'pubmatic',
+            params: {
+              publisherId: '156209',
+              adSlot: 'pubmatic_test2@728x90:0',
+              pmzoneid: 'zone1',
+              kadpageurl: 'www.yahoo.com'
+            }
+          }
+        ]
+      },
+      {
+        code: 'video1',
+        mediaTypes: {
+          video: {
+            playerSize: [640, 480],
+            context: 'instream'
+          }
+        },
+        bids:
+        [
+          {
+            bidder: 'pubmatic',
+            params: {
+              publisherId: '351',
+              adSlot: '1363568@300x250', // ad_id or tagid
+              video: {
+                skippable: true,
+                minduration: 5,
+                maxduration: 30,
+                mimes: ['video/mp4', 'video/x-flv'],
+                startdelay: 5,
+                playbackmethod: [1, 3],
+                api: [ 1, 2 ],
+                protocols: [ 2, 3 ],
+                w: 640,
+                h: 480,
+                battr: [ 13, 14 ],
+                linearity: 1,
+                placement: 2
+              }
+            }
+          }
+        ]
       }
     ];
 
@@ -149,7 +218,7 @@ describe('PubMatic adapter', () => {
   	describe('Request formation', () => {
   		it('Endpoint checking', () => {
   		  let request = spec.buildRequests(bidRequests);
-        expect(request.url).to.equal('//hbopenbid.pubmatic.com/translator?source=prebid-client');
+        expect(request.url).to.equal('//172.16.4.79:8000/translator?source=prebid-client');
         expect(request.method).to.equal('POST');
   		});
 
@@ -220,12 +289,14 @@ describe('PubMatic adapter', () => {
       it('Request params check for video ad', () => {
         let request = spec.buildRequests(videoBidRequests);
         let data = JSON.parse(request.data);
-        expect(data.ext.skippable).to.equal(videoBidRequests.params.video.skippable);
-        expect(data.imp[0].tagid).to.equal('1363568');
+        expect(data.ext.video_skippable).to.equal(videoBidRequests[0].params.video.skippable);
         expect(data.imp[0].video).to.exist;
-        expect(data.imp[0].video.mimes).to.equal(videoBidRequests.params.video.mimes);
-        expect(data.imp[0].video.maxduration).to.equal(videoBidRequests.params.video.maxduration);
-        expect(data.imp[0].video.minduration).to.equal(videoBidRequests.params.video.minduration);
+        expect(data.imp[0].tagid).to.equal('1363568');
+        for (var key in videoBidRequests[0].params.video) {
+          if (!Array.isArray(data.imp[0]['video'][key])) {
+            expect(data.imp[0]['video'][key]).to.equal(videoBidRequests[0].params.video[key]);
+          }
+        }
       });
 
   		it('invalid adslot', () => {
