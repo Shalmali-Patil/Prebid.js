@@ -367,7 +367,9 @@ export const spec = {
             if (parsedRequest.imp && parsedRequest.imp.length > 0) {
               parsedRequest.imp.forEach(req => {
                 if (bid.impid === req.id && req.hasOwnProperty('video')) {
-                  bid.mediaType = 'video';
+                  newBid.mediaType = 'video';
+                  newBid.w = bid.w;
+                  newBid.h = bid.h;
                 }
               });
             }

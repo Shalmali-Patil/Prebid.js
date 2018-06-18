@@ -10,9 +10,9 @@ Maintainer: header-bidding@pubmatic.com
 
 Connects to PubMatic exchange for bids.
 
-PubMatic bid adapter supports Banner currently.
+PubMatic bid adapter supports Video and Banner currently.
 
-# Sample Ad Unit: For Publishers
+# Sample Banner Ad Unit: For Publishers
 ```
 var adUnits = [
 {
@@ -35,7 +35,43 @@ var adUnits = [
         kadfloor: '0.50'                     // optional 									
       }
     }]
-}
+}];
+```
+
+# Sample Video Ad Unit: For Publishers
+```
+var adVideoAdUnits = [
+{
+    code: 'test-div-video',
+    mediaTypes: {
+        video: {
+            playerSize: [640, 480],
+            context: 'instream'
+        }
+    }, 
+    bids: [{
+      bidder: 'pubmatic',
+      params: {
+        publisherId: '351',                     // required
+        adSlot: '1363568@300x250',              // required
+        video: {
+          mimes: ['video/mp4','video/x-flv'],   // required
+          skippable: true,                      // optional
+          minduration: 5,                       // optional
+          maxduration: 30,                      // optional
+          startdelay: 5,                        // optional
+          playbackmethod: [1,3],                // optional
+          api: [ 1, 2 ],                        // optional
+          protocols: [ 2, 3 ],                  // optional
+          w: 640,                               // optional
+          h: 480,                               // optional
+          battr: [ 13, 14 ],                    // optional
+          linearity: 1,                         // optional
+          placement: 2                          // optional
+        }
+      }
+    }]
+}]
 ```
 
 ### Configuration
