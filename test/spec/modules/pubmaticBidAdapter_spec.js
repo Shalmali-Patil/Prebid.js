@@ -24,7 +24,7 @@ describe('PubMatic adapter', () => {
     		  wiid: '1234567890',
     		  profId: '100',
     		  verId: '200',
-          kadfloorcur: 'AUD'
+          bidfloorcur: 'AUD'
         },
         placementCode: '/19968336/header-bid-tag-1',
         sizes: [[300, 250], [300, 600]],
@@ -161,7 +161,7 @@ describe('PubMatic adapter', () => {
   		  expect(data.imp[0].banner.w).to.equal(300); // width
   		  expect(data.imp[0].banner.h).to.equal(250); // height
   		  expect(data.imp[0].ext.pmZoneId).to.equal(bidRequests[0].params.pmzoneid.split(',').slice(0, 50).map(id => id.trim()).join()); // pmzoneid
-        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.kadfloorcur);
+        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
   		});
 
       it('Request params currency check', () => {
@@ -181,7 +181,7 @@ describe('PubMatic adapter', () => {
               wiid: '1234567890',
               profId: '100',
               verId: '200',
-              kadfloorcur: 'AUD'
+              bidfloorcur: 'AUD'
             },
             placementCode: '/19968336/header-bid-tag-1',
             sizes: [[300, 250], [300, 600]],
@@ -205,7 +205,7 @@ describe('PubMatic adapter', () => {
               wiid: '1234567890',
               profId: '100',
               verId: '200',
-              kadfloorcur: 'GBP'
+              bidfloorcur: 'GBP'
             },
             placementCode: '/19968336/header-bid-tag-1',
             sizes: [[300, 250], [300, 600]],
@@ -217,33 +217,33 @@ describe('PubMatic adapter', () => {
         ];
 
         /* case 1 -
-            kadfloor specifiedd in both adunits
-            output: imp[0] and imp[1] both use currency specified in bidRequests[0].params.kadfloorcur
+            bidfloorcur specified in both adunits
+            output: imp[0] and imp[1] both use currency specified in bidRequests[0].params.bidfloorcur
 
         */
         let request = spec.buildRequests(multipleBidRequests);
         let data = JSON.parse(request.data);
 
-        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.kadfloorcur);
-        expect(data.imp[1].bidfloorcur).to.equal(bidRequests[0].params.kadfloorcur);
+        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
+        expect(data.imp[1].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
 
         /* case 2 -
-            kadfloor specified in only 1st adunit
-            output: imp[0] and imp[1] both use currency specified in bidRequests[0].params.kadfloorcur
+            bidfloorcur specified in only 1st adunit
+            output: imp[0] and imp[1] both use currency specified in bidRequests[0].params.bidfloorcur
 
         */
-        delete multipleBidRequests[1].params.kadfloorcur;
+        delete multipleBidRequests[1].params.bidfloorcur;
         request = spec.buildRequests(multipleBidRequests);
         data = JSON.parse(request.data);
-        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.kadfloorcur);
-        expect(data.imp[1].bidfloorcur).to.equal(bidRequests[0].params.kadfloorcur);
+        expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
+        expect(data.imp[1].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
 
         /* case 3 -
             kadfloor not specified in any adunit
             output: imp[0] and imp[1] both use default currency - USD
 
         */
-        delete multipleBidRequests[0].params.kadfloorcur;
+        delete multipleBidRequests[0].params.bidfloorcur;
         request = spec.buildRequests(multipleBidRequests);
         data = JSON.parse(request.data);
         expect(data.imp[0].bidfloorcur).to.equal('USD');
@@ -254,7 +254,7 @@ describe('PubMatic adapter', () => {
             output: imp[0] and imp[1] both use default currency - USD
 
         */
-        multipleBidRequests[1].params.kadfloorcur = 'AUD';
+        multipleBidRequests[1].params.bidfloorcur = 'AUD';
         request = spec.buildRequests(multipleBidRequests);
         data = JSON.parse(request.data);
         expect(data.imp[0].bidfloorcur).to.equal('USD');

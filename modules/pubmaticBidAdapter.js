@@ -167,7 +167,7 @@ function _createImpressionObject(bid, conf) {
     ext: {
       pmZoneId: _parseSlotParam('pmzoneid', bid.params.pmzoneid)
     },
-    bidfloorcur: bid.params.kadfloorcur ? _parseSlotParam('kadfloorcur', bid.params.kadfloorcur) : DEFAULT_CURRENCY
+    bidfloorcur: bid.params.bidfloorcur ? _parseSlotParam('bidfloorcur', bid.params.bidfloorcur) : DEFAULT_CURRENCY
   };
 }
 
@@ -215,11 +215,11 @@ export const spec = {
       conf = _handleCustomParams(bid.params, conf);
       conf.transactionId = bid.transactionId;
       if (bidCurrency === '') {
-        bidCurrency = bid.params.kadfloorcur || undefined;
-      } else if (bid.params.hasOwnProperty('kadfloorcur') && bidCurrency !== bid.params.kadfloorcur) {
+        bidCurrency = bid.params.bidfloorcur || undefined;
+      } else if (bid.params.hasOwnProperty('bidfloorcur') && bidCurrency !== bid.params.bidfloorcur) {
         utils.logWarn('PubMatic: Currency specifier ignored. Only one currency permitted.');
       }
-      bid.params.kadfloorcur = bidCurrency
+      bid.params.bidfloorcur = bidCurrency
       payload.imp.push(_createImpressionObject(bid, conf));
     });
 

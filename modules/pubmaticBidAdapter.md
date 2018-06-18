@@ -32,8 +32,8 @@ var adUnits = [
         yob: '1982',                         // optional
         kadpageurl: 'www.test.com',          // optional							
         gender: 'M',                         // optional
-        kadfloor: '0.50'                     // optional
-        kadfloorcur: 'AUD'                   // optional
+        kadfloor: '0.50'  ,                   // optional
+        bidfloorcur: 'AUD'                   // optional
       }
     }]
 }
