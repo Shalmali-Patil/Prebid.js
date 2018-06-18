@@ -1,6 +1,6 @@
 {
   "name": "prebid.js",
-  "version": "1.12.0-pre",
+  "version": "1.13.0",
   "description": "Header Bidding Management Library",
   "main": "src/prebid.js",
   "scripts": {
@@ -88,6 +88,7 @@
     "mkpath": "^1.0.0",
     "mocha": "2.2.5",
     "mock-fs": "^3.11.0",
+    "number-is-nan": "1.0.1",
     "nightwatch": "^0.9.5",
     "open": "0.0.5",
     "proxyquire": "^1.7.10",
