@@ -4,7 +4,7 @@ import { BANNER, VIDEO } from 'src/mediaTypes';
 const constants = require('src/constants.json');
 
 const BIDDER_CODE = 'pubmatic';
-const ENDPOINT = '//172.16.4.79:8000/translator?source=prebid-client';
+const ENDPOINT = '//hbopenbid.pubmatic.com/translator?source=prebid-client';
 const USYNCURL = '//ads.pubmatic.com/AdServer/js/showad.js#PIX&kdntuid=1&p=';
 const CURRENCY = 'USD';
 const AUCTION_TYPE = 1;
@@ -370,6 +370,7 @@ export const spec = {
                   newBid.mediaType = 'video';
                   newBid.w = bid.w;
                   newBid.h = bid.h;
+                  newBid.vastXml = bid.adm;
                 }
               });
             }
