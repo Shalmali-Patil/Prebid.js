@@ -33,6 +33,7 @@ const VIDEO_CUSTOM_PARAMS = {
   'battr': 'array',
   'linearity': 'number',
   'placement': 'number',
+  'minbitrate': 'number',
   'maxbitrate': 'number'
 }
 const NET_REVENUE = false;
