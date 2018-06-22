@@ -224,6 +224,9 @@ function _createImpressionObject(bid, conf) {
         videoObj[key] = _checkParamDataType(key, videoData[key], VIDEO_CUSTOM_PARAMS[key])
       }
     }
+    videoObj.ext = {
+      "video_skippable": bid.params.video.skippable || false
+    }
     impObj.video = videoObj;
   } else {
     bannerObj = {
@@ -287,9 +290,6 @@ export const spec = {
       conf = _handleCustomParams(bid.params, conf);
       conf.transactionId = bid.transactionId;
       payload.imp.push(_createImpressionObject(bid, conf));
-      if (bid.params.hasOwnProperty('video')) {
-        payload.ext.video_skippable = bid.params.video.skippable || false;
-      }
     });
 
     if (payload.imp.length == 0) {
