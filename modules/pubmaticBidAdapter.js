@@ -224,7 +224,7 @@ function _createImpressionObject(bid, conf) {
       }
     }
     videoObj.ext = {
-      "video_skippable": bid.params.video.skippable || false
+      'video_skippable': bid.params.video.skippable || false
     }
     impObj.video = videoObj;
   } else {
