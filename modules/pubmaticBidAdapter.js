@@ -21,7 +21,6 @@ const CUSTOM_PARAMS = {
 };
 const VIDEO_CUSTOM_PARAMS = {
   'mimes': 'array',
-  'skippable': 'boolean',
   'minduration': 'number',
   'maxduration': 'number',
   'startdelay': 'number',
