@@ -223,6 +223,14 @@ function _createImpressionObject(bid, conf) {
         videoObj[key] = _checkParamDataType(key, videoData[key], VIDEO_CUSTOM_PARAMS[key])
       }
     }
+    // read playersize and assign to h and w.
+    if (utils.isArray(bid.mediaTypes.video.playerSize[0])) {
+      videoObj.w = bid.mediaTypes.video.playerSize[0][0];
+      videoObj.h = bid.mediaTypes.video.playerSize[0][1];
+    } else if (utils.isNumber(bid.mediaTypes.video.playerSize[0])) {
+      videoObj.w = bid.mediaTypes.video.playerSize[0];
+      videoObj.h = bid.mediaTypes.video.playerSize[1];
+    }
     videoObj.ext = {
       'video_skippable': bid.params.video.skippable || false
     }
@@ -281,9 +289,16 @@ export const spec = {
     var payload = _createOrtbTemplate(conf);
     validBidRequests.forEach(bid => {
       _parseAdSlot(bid);
-      if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex && bid.params.width && bid.params.height)) {
-        utils.logWarn('PubMatic: Skipping the non-standard adslot:', bid.params.adSlot, bid);
-        return;
+      if (!bid.params.hasOwnProperty('video')) {
+        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex && bid.params.width && bid.params.height)) {
+          utils.logWarn('PubMatic: Skipping the non-standard adslot: ', bid.params.adSlot, bid);
+          return;
+        }
+      } else {
+        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex)) {
+          utils.logWarn('PubMatic: Skipping the non-standard adslot: ', bid.params.adSlot, bid);
+          return;
+        }
       }
       conf.pubId = conf.pubId || bid.params.publisherId;
       conf = _handleCustomParams(bid.params, conf);
