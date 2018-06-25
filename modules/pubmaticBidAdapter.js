@@ -232,7 +232,7 @@ function _createImpressionObject(bid, conf) {
       videoObj.h = bid.mediaTypes.video.playerSize[1];
     }
     videoObj.ext = {
-      'video_skippable': bid.params.video.skippable || false
+      'video_skippable': bid.params.video.skippable ? 1 : 0
     }
     impObj.video = videoObj;
   } else {
@@ -383,8 +383,8 @@ export const spec = {
               parsedRequest.imp.forEach(req => {
                 if (bid.impid === req.id && req.hasOwnProperty('video')) {
                   newBid.mediaType = 'video';
-                  newBid.w = bid.w;
-                  newBid.h = bid.h;
+                  newBid.width = bid.hasOwnProperty('w') ? bid.w : req.video.w;
+                  newBid.height = bid.hasOwnProperty('h') ? bid.h : req.video.h;
                   newBid.vastXml = bid.adm;
                 }
               });
