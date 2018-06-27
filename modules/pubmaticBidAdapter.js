@@ -223,13 +223,10 @@ function _createImpressionObject(bid, conf) {
         videoObj[key] = _checkParamDataType(key, videoData[key], VIDEO_CUSTOM_PARAMS[key])
       }
     }
-    // read playersize and assign to h and w.
-    if (utils.isArray(bid.mediaTypes.video.playerSize[0])) {
-      videoObj.w = bid.mediaTypes.video.playerSize[0][0];
-      videoObj.h = bid.mediaTypes.video.playerSize[0][1];
-    } else if (utils.isNumber(bid.mediaTypes.video.playerSize[0])) {
-      videoObj.w = bid.mediaTypes.video.playerSize[0];
-      videoObj.h = bid.mediaTypes.video.playerSize[1];
+    // read playersize from sizes array and assign to h and w.
+    if (bid.hasOwnProperty('sizes') && utils.isArray(bid.sizes)) {
+      videoObj.w = bid.sizes[0][0];
+      videoObj.h = bid.sizes[0][1];
     }
     videoObj.ext = {
       'video_skippable': bid.params.video.skippable ? 1 : 0
