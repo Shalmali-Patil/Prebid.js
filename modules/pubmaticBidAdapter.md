@@ -45,7 +45,7 @@ var adVideoAdUnits = [
     code: 'test-div-video',
     mediaTypes: {
         video: {
-            playerSize: [640, 480],
+            playerSize: [640, 480],           // required
             context: 'instream'
         }
     }, 
@@ -63,11 +63,11 @@ var adVideoAdUnits = [
           playbackmethod: [1,3],                // optional
           api: [ 1, 2 ],                        // optional
           protocols: [ 2, 3 ],                  // optional
-          w: 640,                               // optional
-          h: 480,                               // optional
           battr: [ 13, 14 ],                    // optional
           linearity: 1,                         // optional
-          placement: 2                          // optional
+          placement: 2,                         // optional
+          minbitrate: 10,                       // optional
+          maxbitrate: 10                        // optional
         }
       }
     }]
@@ -85,5 +85,15 @@ pbjs.setConfig({
     enabledBidders: ['pubmatic'],
     syncDelay: 6000
  }});
+
+
+For Video ads, prebid cache needs to be enabled for PubMatic adapter.
+pbjs.setConfig({
+    debug: true,
+    cache: {
+        url: 'https://prebid.adnxs.com/pbc/v1/cache'
+    }
+});
+
 ```
 Note: Combine the above the configuration with any other UserSync configuration.  Multiple setConfig() calls overwrite each other and only last call for a given attribute will take effect.
