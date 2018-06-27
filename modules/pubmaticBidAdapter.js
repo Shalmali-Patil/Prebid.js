@@ -252,7 +252,7 @@ export const spec = {
   supportedMediaTypes: [BANNER, VIDEO],
   /**
   * Determines whether or not the given bid request is valid. Valid bid request must have placementId and hbid
-  *
+  *mimes
   * @param {BidRequest} bid The bid params to validate.
   * @return boolean True if this is a valid bid, and false otherwise.
   */
@@ -289,13 +289,13 @@ export const spec = {
     var payload = _createOrtbTemplate(conf);
     validBidRequests.forEach(bid => {
       _parseAdSlot(bid);
-      if (!bid.params.hasOwnProperty('video')) {
-        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex && bid.params.width && bid.params.height)) {
+      if (bid.params.hasOwnProperty('video')) {
+        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex)) {
           utils.logWarn('PubMatic: Skipping the non-standard adslot: ', bid.params.adSlot, bid);
           return;
         }
       } else {
-        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex)) {
+        if (!(bid.params.adSlot && bid.params.adUnit && bid.params.adUnitIndex && bid.params.width && bid.params.height)) {
           utils.logWarn('PubMatic: Skipping the non-standard adslot: ', bid.params.adSlot, bid);
           return;
         }
