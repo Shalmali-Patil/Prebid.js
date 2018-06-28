@@ -231,9 +231,12 @@ function _createImpressionObject(bid, conf) {
       videoObj.w = bid.mediaTypes.video.playerSize[0];
       videoObj.h = bid.mediaTypes.video.playerSize[1];
     }
-    videoObj.ext = {
-      'video_skippable': bid.params.video.skippable ? 1 : 0
+    if (bid.params.video.hasOwnProperty('skippable')) {
+      videoObj.ext = {
+        'video_skippable': bid.params.video.skippable ? 1 : 0
+      }  
     }
+    
     impObj.video = videoObj;
   } else {
     bannerObj = {
