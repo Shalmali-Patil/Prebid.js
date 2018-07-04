@@ -172,7 +172,7 @@ function _createImpressionObject(bid, conf) {
     bidfloorcur: bid.params.bidfloorcur ? _parseSlotParam('bidfloorcur', bid.params.bidfloorcur) : DEFAULT_CURRENCY
   };
   if (sizes.length > 1) {
-    sizes = sizes.splice(1, sizes.length);
+    sizes = sizes.splice(1);
     var format = [];
     sizes.forEach(size => {
       format.push({w: size[0], h: size[1]});
