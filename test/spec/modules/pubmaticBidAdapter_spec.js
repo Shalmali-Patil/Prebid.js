@@ -160,6 +160,9 @@ describe('PubMatic adapter', () => {
   		  expect(data.imp[0].tagid).to.equal('/15671365/DMDemo'); // tagid
   		  expect(data.imp[0].banner.w).to.equal(300); // width
   		  expect(data.imp[0].banner.h).to.equal(250); // height
+        expect(data.imp[0].banner.format).to.be.an('array').with.length.above(0);
+        expect(data.imp[0].banner.format[0].w).to.equal(300);
+        expect(data.imp[0].banner.format[0].h).to.equal(600);
   		  expect(data.imp[0].ext.pmZoneId).to.equal(bidRequests[0].params.pmzoneid.split(',').slice(0, 50).map(id => id.trim()).join()); // pmzoneid
         expect(data.imp[0].bidfloorcur).to.equal(bidRequests[0].params.bidfloorcur);
   		});

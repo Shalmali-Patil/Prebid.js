@@ -153,15 +153,17 @@ function _createOrtbTemplate(conf) {
 }
 
 function _createImpressionObject(bid, conf) {
-  return {
+  var sizes = bid.sizes;
+
+  var impObj = {
     id: bid.bidId,
     tagid: bid.params.adUnit,
     bidfloor: _parseSlotParam('kadfloor', bid.params.kadfloor),
     secure: window.location.protocol === 'https:' ? 1 : 0,
     banner: {
       pos: 0,
-      w: bid.params.width,
-      h: bid.params.height,
+      w: sizes ? sizes[0][0] : bid.params.width,
+      h: sizes ? sizes[0][1] : bid.params.height,
       topframe: utils.inIframe() ? 0 : 1,
     },
     ext: {
@@ -169,6 +171,15 @@ function _createImpressionObject(bid, conf) {
     },
     bidfloorcur: bid.params.bidfloorcur ? _parseSlotParam('bidfloorcur', bid.params.bidfloorcur) : DEFAULT_CURRENCY
   };
+  if (sizes.length > 1) {
+    sizes = sizes.splice(1, sizes.length);
+    var format = [];
+    sizes.forEach(size => {
+      format.push({w: size[0], h: size[1]});
+    });
+    impObj.banner.format = format;
+  }
+  return impObj;
 }
 
 export const spec = {
