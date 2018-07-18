@@ -33,6 +33,7 @@ var adUnits = [
         kadpageurl: 'www.test.com',          // optional							
         gender: 'M',                         // optional
         kadfloor: '0.50'                     // optional 									
+        dctr: 'key1=123|key2=345'            // optional
       }
     }]
 }];

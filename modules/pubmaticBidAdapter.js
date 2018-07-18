@@ -17,7 +17,8 @@ const CUSTOM_PARAMS = {
   'lon': '', // User Location - Longitude
   'wiid': '', // OpenWrap Wrapper Impression ID
   'profId': '', // OpenWrap Legacy: Profile ID
-  'verId': '' // OpenWrap Legacy: version ID
+  'verId': '', // OpenWrap Legacy: version ID,
+  'dctr': ''
 };
 const DATA_TYPES = {
   'NUMBER': 'number',
@@ -256,6 +257,20 @@ function _createImpressionObject(bid, conf) {
   return impObj;
 }
 
+function _addFirstValueInAdUnitsArrayForParam(param, bidRequests) {
+  var value = '';
+  bidRequests.forEach(bid => {
+    if (value !== '') {
+      utils.logWarn(BIDDER_CODE + ': Only 1st value detected for ' + param + ' will be considered. Subsequent values will be ignored.');
+      return;
+    }
+    if (bid.params.hasOwnProperty(param) && utils.isStr(bid.params[param]) && bid.params[param].length > 0) {
+      value = bid.params[param].trim();
+    }
+  });
+  return value;
+}
+
 export const spec = {
   code: BIDDER_CODE,
   supportedMediaTypes: [BANNER, VIDEO],
@@ -296,6 +311,7 @@ export const spec = {
   buildRequests: (validBidRequests, bidderRequest) => {
     var conf = _initConf();
     var payload = _createOrtbTemplate(conf);
+    var dctr = '';
     validBidRequests.forEach(bid => {
       _parseAdSlot(bid);
       if (bid.params.hasOwnProperty('video')) {
@@ -352,6 +368,12 @@ export const spec = {
     payload.device.geo.lon = _parseSlotParam('lon', conf.lon);
     payload.site.page = conf.kadpageurl.trim() || payload.site.page.trim();
     payload.site.domain = _getDomainFromURL(payload.site.page);
+    dctr = _addFirstValueInAdUnitsArrayForParam('dctr', validBidRequests);
+    if (dctr !== '') {
+      payload.site.ext = {
+        key_val: dctr
+      }
+    }
     return {
       method: 'POST',
       url: ENDPOINT,
