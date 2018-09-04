@@ -325,7 +325,7 @@ export const spec = {
                     ttl: 300,
                     referrer: referrer,
                     ad: firstSummary ? bid.adm : '',
-                    serverSideResponseTime: (summary.errorCode === 5) ? 0 : (partnerResponseTimeObj[summary.bidder] || 0)
+                    serverSideResponseTime: /*(summary.errorCode === 5) ? 0 : */(partnerResponseTimeObj[summary.bidder] || 0)
                     /* setting serverSideResponseTime as 0, in cases where partnerResponseTimeObj[summary.bidder] is not available.
                        probable causes for this happening will be, pubmaticServerErrorCode is one of the following:
                        1 = GADS_UNMAPPED_SLOT_ERROR
