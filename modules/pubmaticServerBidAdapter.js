@@ -325,7 +325,7 @@ export const spec = {
                     ttl: 300,
                     referrer: referrer,
                     ad: firstSummary ? bid.adm : '',
-                    serverSideResponseTime: (summary.errorCode === 5) ? 0 : (partnerResponseTimeObj[summary.bidder] || 0)
+                    serverSideResponseTime: (summary.errorCode === 5 || summary.errorCode === 1) ? 0 : (partnerResponseTimeObj[summary.bidder] || 0)
                     /* errorCodes meaning:
                         1 = GADS_UNMAPPED_SLOT_ERROR
                         2 = GADS_MISSING_CONF_ERROR
